@@ -23,6 +23,7 @@ aquaman = 0
 wolverine = 0
 superman = 0
 
+# Collects, parses, and finds links on a given page
 def get_initial_link_list(soup):
     for link in soup.find_all('a'):
         all_links.append(link.get('href'))
@@ -40,7 +41,7 @@ def get_initial_link_list(soup):
         get_final_links(link)
 
 
-# Collects, parses, and finds links on a given page
+# Collects, parses, and finds links on link found in initial page
 def get_sub_links(url):
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     resp = urlopen(req).read()
@@ -53,18 +54,19 @@ def get_sub_links(url):
                 print("sublink: ", link)
                 all_sub_links.append(root_url + str(link.get('href')).split('&')[0][2:])
 
+# Grabs all the discussion board links
 def get_final_links(url):
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     resp = urlopen(req).read()
     soup = BeautifulSoup(resp, 'html.parser')
 
-    # Tries to search keyword "permissions" to only add non-restricted links to sublink list
     if "to view this forum" not in str(soup):
         for link in soup.find_all('a'):
             if "viewtopic" in str(link):
                 print("Final_Link: ", link)
                 final_links.append(root_url + str(link.get('href')))
 
+# Reviews text on discussion boards for keyword matches to hero names
 def count_super_hero(url):
     global superman
     global batman
@@ -110,7 +112,7 @@ def count_super_hero(url):
 
     return (superman, batman, supergirl, aquaman, wolverine)
 
-
+# Runs the main script() and prints final counts
 get_initial_link_list(soup)
 n = 1
 for link in final_links:
